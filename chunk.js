@@ -1,5 +1,7 @@
 class Chunk {
-    constructor(pos, size) {
+    static capacity = 16;
+    constructor(id, pos, size) {
+        this.id = id;
         this.pos = pos;
         this.size = size;
         this.map = [];
@@ -12,7 +14,7 @@ class Chunk {
                 const sampleY = this.pos.y + y * noiseScale;
                 const sampleX2 = this.pos.x + x * noiseScale2 + 100;
                 const sampleY2 = this.pos.y + y * noiseScale2 + 100;
-                this.map[y][x] = 0.0 < noise.simplex2(sampleX, sampleY) * noise.simplex2(sampleX2, sampleY2) + y / this.size.y / 0.4 - 1.5;
+                this.map[y][x] = 0.0 < noise.simplex2(sampleX, sampleY) * noise.simplex2(sampleX2, sampleY2) + y / this.size.y / 0.45 - 1.0;
             }
         }
         this.color = randomColor();

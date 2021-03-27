@@ -7,16 +7,14 @@ let lastFrameTime = 0;
 const centerOfScreen = new Vector();
 const cellSize = 20;
 noise.seed(Math.random());
+let leftChunkIndex;
+let rightChunkIndex;
 
 updateSize();
 
-const camera = centerOfScreen.copy().scale(0);
-const player = new Vector(width / 2, height / 2);
-const chunks = []
-chunks.push(new Chunk(new Vector(0, 0), new Vector( Math.ceil(width / cellSize), Math.ceil(height / cellSize))));
-chunks.push(new Chunk(new Vector(Math.floor(Math.ceil(width / cellSize) * cellSize), 0), new Vector( Math.ceil(width / cellSize), Math.ceil(height / cellSize))));
-chunks.push(new Chunk(new Vector(Math.floor(Math.ceil(width / cellSize) * cellSize * 2), 0), new Vector( Math.ceil(width / cellSize), Math.ceil(height / cellSize))));
+const chunks = [];
+const chunkSize = new Vector(64, 64)
+const player = new Vector(width / 2, cellSize * chunkSize.y / 2);
+const camera = player.sub(centerOfScreen);
 
-
-
-frame();
+frame(0);

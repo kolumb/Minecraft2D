@@ -9,11 +9,19 @@ function tick(dt) {
     const distFromCameraToPlayer = player.sub(camera.add(centerOfScreen));
     const cameraSpring = 0.05;
     camera.addMut(distFromCameraToPlayer.scale(cameraSpring * dt));
+    leftChunkIndex = Math.floor(camera.x / chunkSize.x / cellSize);
+    rightChunkIndex = Math.floor((camera.x + width) / chunkSize.x / cellSize);
+    range(leftChunkIndex, rightChunkIndex).forEach(i => {
+        const index = mod(i, Chunk.capacity);
+        if (!chunks[index] || chunks[index].id !== i) {
+            chunks[index] = new Chunk(i, new Vector(chunkSize.x * cellSize * i, 0), chunkSize)
+        }
+    })
 }
 function render() {
     ctx.fillStyle = pause ? "rgb(200,200,200)" : "rgb(240,240,240)";
     ctx.fillRect(0, 0, width, height);
-    chunks.forEach(c => c.draw());
+    range(leftChunkIndex, rightChunkIndex).forEach(i => chunks[mod(i, Chunk.capacity)].draw());
     ctx.fillStyle = "#463";
     const x = player.x-5 - camera.x;
     const y = player.y-5 - camera.y;

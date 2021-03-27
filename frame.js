@@ -13,19 +13,24 @@ function tick(dt) {
 function render() {
     ctx.fillStyle = pause ? "rgb(200,200,200)" : "rgb(240,240,240)";
     ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = "#888";
+    for (let y = 0; y < chunk.size.y; y++) {
+        for (let x = 0; x < chunk.size.x; x++) {
+            if (chunk.map[y][x])
+                ctx.fillRect(x * cellSize - camera.x, y * cellSize - camera.y, cellSize, cellSize);
+        }
+    }
     ctx.fillStyle = "#463";
     const x = player.x-5 - camera.x;
     const y = player.y-5 - camera.y;
     ctx.fillRect(x, y, 10, 10);
-    ctx.fillRect(10 - camera.x, 100 - camera.y, 10, 10);
-    ctx.fillRect(100 - camera.x, 200 - camera.y, 10, 10);
 }
 
 function frame(timestamp) {
     const dt = timestamp - lastFrameTime;
     lastFrameTime = timestamp;
 
-    if (dt < 1000) tick(dt * 0.06);
+    if (dt < 1000) tick(dt * 60 / 1000);
     render();
     if (pause === false) {
         requestAnimationFrame(frame);

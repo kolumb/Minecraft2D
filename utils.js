@@ -35,3 +35,7 @@ function toggleFullScreen() {
         }
     }
 }
+
+function getNoise(pos, amplitude) {
+    return amplitude * noise.simplex2(pos.x, pos.y);
+}

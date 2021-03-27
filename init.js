@@ -12,16 +12,11 @@ updateSize();
 
 const camera = centerOfScreen.copy().scale(0);
 const player = new Vector(width / 2, height / 2);
-const chunk =
-    { size: new Vector( Math.ceil(width / cellSize), Math.ceil(height / cellSize))
-    , map: []
-    }
+const chunks = []
+chunks.push(new Chunk(new Vector(0, 0), new Vector( Math.ceil(width / cellSize), Math.ceil(height / cellSize))));
+chunks.push(new Chunk(new Vector(Math.floor(Math.ceil(width / cellSize) * cellSize), 0), new Vector( Math.ceil(width / cellSize), Math.ceil(height / cellSize))));
+chunks.push(new Chunk(new Vector(Math.floor(Math.ceil(width / cellSize) * cellSize * 2), 0), new Vector( Math.ceil(width / cellSize), Math.ceil(height / cellSize))));
 
-for (let y = 0; y < chunk.size.y; y++) {
-    chunk.map[y] = [];
-    for (let x = 0; x < chunk.size.x; x++) {
-        chunk.map[y][x] = 0.0 < noise.simplex2(x*0.15, y*0.15) * noise.simplex2(x*0.01 + 100, y*0.01) + y / chunk.size.y / 0.4 - 1.5;
-    }
-}
+
 
 frame();

@@ -22,10 +22,21 @@ function render() {
     ctx.fillStyle = pause ? "rgb(200,200,200)" : "rgb(240,240,240)";
     ctx.fillRect(0, 0, width, height);
     range(leftChunkIndex, rightChunkIndex).forEach(i => chunks[mod(i, Chunk.capacity)].draw());
-    ctx.fillStyle = "#463";
-    const x = player.x-5 - camera.x;
-    const y = player.y-5 - camera.y;
-    ctx.fillRect(x, y, 10, 10);
+    const x = player.x - camera.x;
+    const y = player.y - camera.y;
+    const px = cellSize * 1.8 / 32;
+    ctx.fillStyle = "#6b6b6b"; // feet
+    ctx.fillRect(x - 2*px, y - 2*px, 4*px, 2*px);
+    ctx.fillStyle = "#463aa5"; // pants
+    ctx.fillRect(x - 2*px, y - 12*px, 4*px, 10*px);
+    ctx.fillStyle = "#b58b6f"; // hands
+    ctx.fillRect(x - 2*px, y - 20*px, 4*px, 8*px);
+    ctx.fillStyle = "#00bdbd"; // shirt
+    ctx.fillRect(x - 2*px, y - 24*px, 4*px, 4*px);
+    ctx.fillStyle = "#b87b63"; // face
+    ctx.fillRect(x - 4*px, y - 28*px, 8*px, 4*px);
+    ctx.fillStyle = "#281c0d"; // hair
+    ctx.fillRect(x - 4*px, y - 32*px, 8*px, 4*px);
 }
 
 function frame(timestamp) {

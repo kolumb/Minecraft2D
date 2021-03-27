@@ -2,6 +2,7 @@
 const updateSize = () => {
     width = innerWidth;
     height = innerHeight;
+    centerOfScreen.set(width / 2, height / 2);
     canvas.height = height;
     canvas.width = width;
     lesser = width < height ? width : height;

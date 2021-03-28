@@ -8,6 +8,14 @@ class Vector {
     normalized() { return this.scale(1 / this.length()); }
     normalizeMut() { this.scaleMut(1 / this.length()); }
 
+    scale(f) { return new Vector(this.x * f, this.y * f); }
+    scaleMut(f) {
+        this.x *= f;
+        this.y *= f;
+        return this;
+    }
+    shrink(f) { return new Vector(this.x / f, this.y / f); }
+
     add(v) { return new Vector(this.x + v.x, this.y + v.y); }
     addMut(v) {
         this.x += v.x;
@@ -20,9 +28,11 @@ class Vector {
         this.y -= v.y;
         return this;
     }
-    dot(v) { return this.x * v.x + this.y * v.y; }
-
     mult(v) { return new Vector(this.x * v.x, this.y * v.y); }
+
+    div(v) { return new Vector(this.x / v.x, this.y / v.y); }
+
+    dot(v) { return this.x * v.x + this.y * v.y; }
 
     dist(v) { return Math.hypot(this.x - v.x, this.y - v.y); }
 
@@ -36,13 +46,6 @@ class Vector {
         const dx = v.x - this.x;
         const dy = v.y - this.y;
         return Math.atan2(dy, dx);
-    }
-
-    scale(f) { return new Vector(this.x * f, this.y * f); }
-    scaleMut(f) {
-        this.x *= f;
-        this.y *= f;
-        return this;
     }
     copy() { return new Vector(this.x, this.y); }
 
@@ -67,6 +70,10 @@ class Vector {
             return this;
         }
     }
+    round() { return new Vector(Math.round(this.x), Math.round(this.y)); }
+
+    floor() { return new Vector(Math.floor(this.x), Math.floor(this.y)); }
+
     swap() { return new Vector(this.y, this.x); }
 
     static fromAngle(a) { return new Vector(Math.cos(a), Math.sin(a)); }

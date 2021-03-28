@@ -9,12 +9,14 @@ const cellSize = 20;
 noise.seed(Math.random());
 let leftChunkIndex;
 let rightChunkIndex;
+let currentChunk;
+let playerCoord;
 
 updateSize();
 
 const chunks = [];
 const chunkSize = new Vector(64, 64)
-const player = new Vector(width / 2, cellSize * chunkSize.y / 2);
+const player = new Vector(width / 2, cellSize * chunkSize.y / 2-0.001);
 const camera = player.sub(centerOfScreen);
 
 frame(0);

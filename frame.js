@@ -17,6 +17,13 @@ function tick(dt) {
             chunks[index] = new Chunk(i, new Vector(chunkSize.x * cellSize * i, 0), chunkSize)
         }
     })
+    playerCoord = player.shrink(cellSize).floor();
+    currentChunk = mod(Math.floor(playerCoord.x / chunkSize.x), Chunk.capacity);
+    playerCoord.x %= chunkSize.x;
+    chunks[currentChunk].map[playerCoord.y][mod(playerCoord.x, chunkSize.x)] = false;
+    playerCoord = player.add(new Vector(0, -28 * cellSize * 1.8 / 32)).shrink(cellSize).floor();
+    playerCoord.x %= chunkSize.x;
+    chunks[currentChunk].map[playerCoord.y][mod(playerCoord.x, chunkSize.x)] = false;
 }
 function render() {
     ctx.fillStyle = pause ? "rgb(200,200,200)" : "rgb(240,240,240)";

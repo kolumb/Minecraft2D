@@ -14,9 +14,19 @@ let playerCoord;
 
 updateSize();
 
-const chunks = [];
 const chunkSize = new Vector(64, 64)
+const chunks = [new Chunk(0, new Vector(), chunkSize)];
 const player = new Vector(width / 2, cellSize * chunkSize.y / 2-0.001);
+playerCoord = player.shrink(cellSize).floor();
+currentChunk = mod(Math.floor(playerCoord.x / chunkSize.x), Chunk.capacity);
+playerCoord.x %= chunkSize.x;
+for (let y = 0; y < chunkSize.y; y++) {
+    const isWall = chunks[currentChunk].map[y][mod(playerCoord.x, chunkSize.x)];
+    if (isWall) {
+        player.y = y * cellSize - 0.001;
+        break;
+    }
+}
 const camera = player.sub(centerOfScreen);
 
 frame(0);

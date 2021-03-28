@@ -14,7 +14,7 @@ function tick(dt) {
     range(leftChunkIndex, rightChunkIndex).forEach(i => {
         const index = mod(i, Chunk.capacity);
         if (!chunks[index] || chunks[index].id !== i) {
-            chunks[index] = new Chunk(i, new Vector(chunkSize.x * cellSize * i, 0), chunkSize)
+            chunks[index] = new Chunk(i, new Vector(chunkSize.x * cellSize * i, 0), chunkSize);
         }
     })
     playerCoord = player.shrink(cellSize).floor();

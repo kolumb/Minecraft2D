@@ -22,13 +22,25 @@ function tick(dt) {
     playerCoord = player.add(new Vector(0, -playerHalfWidth * pixelSize)).shrink(cellSize).floor();
     currentChunk = mod(Math.floor(playerCoord.x / chunkSize.x), Chunk.capacity);
     playerCoord.x %= chunkSize.x;
-    chunks[currentChunk].map[playerCoord.y][mod(playerCoord.x, chunkSize.x)] = false;
+    const bottomBlock = new Vector(mod(playerCoord.x, chunkSize.x) + 1, playerCoord.y + 1);
     playerCoord = player.add(new Vector(0, -16 * pixelSize)).shrink(cellSize).floor();
     playerCoord.x %= chunkSize.x;
-    chunks[currentChunk].map[playerCoord.y][mod(playerCoord.x, chunkSize.x)] = false;
     playerCoord = player.add(new Vector(0, -(32 - playerHalfWidth) * pixelSize)).shrink(cellSize).floor();
     playerCoord.x %= chunkSize.x;
-    chunks[currentChunk].map[playerCoord.y][mod(playerCoord.x, chunkSize.x)] = false;
+    const topBlock = new Vector(mod(playerCoord.x, chunkSize.x) - 1, playerCoord.y - 1);
+    for (let y = topBlock.y; y <= bottomBlock.y; y++) {
+        for (let x = topBlock.x; x <= bottomBlock.x; x++) {
+            if (y < 0 || y >= chunkSize.y) continue;
+            let fixChunk = 0;
+            if (x < 0) {
+                fixChunk = -1;
+            } else if (x >= chunkSize.x) {
+                fixChunk = 1;
+            }
+            chunks[mod(currentChunk + fixChunk, Chunk.capacity)].map[y][mod(x, chunkSize.x)] = false;
+        }
+    }
+
 }
 function render() {
     ctx.fillStyle = pause ? "rgb(200,200,200)" : "rgb(240,240,240)";

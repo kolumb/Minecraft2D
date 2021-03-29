@@ -11,6 +11,8 @@ let leftChunkIndex;
 let rightChunkIndex;
 let currentChunk;
 let playerCoord;
+const playerHalfWidth = 4 / 2;
+const gravity = 1;
 
 updateSize();
 
@@ -23,7 +25,7 @@ playerCoord.x %= chunkSize.x;
 for (let y = 0; y < chunkSize.y; y++) {
     const isWall = chunks[currentChunk].map[y][mod(playerCoord.x, chunkSize.x)];
     if (isWall) {
-        player.y = y * cellSize - 0.001;
+        player.y = y * cellSize - 1.001;
         break;
     }
 }

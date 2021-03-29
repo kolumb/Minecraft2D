@@ -6,6 +6,7 @@ function tick(dt) {
     if (Input.left) {
         player.addMut(new Vector(-10 * dt, 0));
     }
+    player.y += gravity;
     const distFromCameraToPlayer = player.sub(camera.add(centerOfScreen));
     const cameraSpring = 0.05;
     camera.addMut(distFromCameraToPlayer.scale(cameraSpring * dt));
@@ -17,11 +18,15 @@ function tick(dt) {
             chunks[index] = new Chunk(i, new Vector(chunkSize.x * cellSize * i, 0), chunkSize);
         }
     })
-    playerCoord = player.shrink(cellSize).floor();
+    const pixelSize = cellSize * 1.8 / 32;
+    playerCoord = player.add(new Vector(0, -playerHalfWidth * pixelSize)).shrink(cellSize).floor();
     currentChunk = mod(Math.floor(playerCoord.x / chunkSize.x), Chunk.capacity);
     playerCoord.x %= chunkSize.x;
     chunks[currentChunk].map[playerCoord.y][mod(playerCoord.x, chunkSize.x)] = false;
-    playerCoord = player.add(new Vector(0, -28 * cellSize * 1.8 / 32)).shrink(cellSize).floor();
+    playerCoord = player.add(new Vector(0, -16 * pixelSize)).shrink(cellSize).floor();
+    playerCoord.x %= chunkSize.x;
+    chunks[currentChunk].map[playerCoord.y][mod(playerCoord.x, chunkSize.x)] = false;
+    playerCoord = player.add(new Vector(0, -(32 - playerHalfWidth) * pixelSize)).shrink(cellSize).floor();
     playerCoord.x %= chunkSize.x;
     chunks[currentChunk].map[playerCoord.y][mod(playerCoord.x, chunkSize.x)] = false;
 }
@@ -44,6 +49,7 @@ function render() {
     ctx.fillRect(x - 4*px, y - 28*px, 8*px, 4*px);
     ctx.fillStyle = "#281c0d"; // hair
     ctx.fillRect(x - 4*px, y - 32*px, 8*px, 4*px);
+    new Vector(0, -28 * cellSize * 1.8 / 32).drawFrom(player.sub(camera));
 }
 
 function frame(timestamp) {

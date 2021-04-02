@@ -35,6 +35,8 @@ const keydownHandler = function(e) {
     switch (e.code) {
         case "Space":
             if (e.target.tagName === "BUTTON") return;
+            Input.up = true;
+            break;
         case "KeyP":
             pause = !pause;
             if (pause === false) {
@@ -63,6 +65,10 @@ window.addEventListener("keydown", keydownHandler);
 
 const keyupHandler = function(e) {
     switch (e.code) {
+        case "Space":
+            if (e.target.tagName === "BUTTON") return;
+            Input.up = false;
+            break;
         case "ArrowUp":
         case "KeyW":
             Input.up = false;

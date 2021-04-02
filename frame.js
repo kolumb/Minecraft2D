@@ -1,12 +1,24 @@
 "use strict";
 function tick(dt) {
+    playerVel.x *= 0.9;
     if (Input.right) {
-        player.addMut(new Vector(10 * dt, 0));
+        if (playerVel.x < 10) {
+            playerVel.x = clamp(playerVel.x + 1 * dt, 10);
+        }
     }
     if (Input.left) {
-        player.addMut(new Vector(-10 * dt, 0));
+        if (playerVel.x > -10) {
+            playerVel.x = clamp(playerVel.x - 1 * dt, -10);
+        }
     }
-    player.y += gravity;
+    if (Input.up) {
+        playerVel.y -= 0.1 * dt;
+    }
+    if (Input.down) {
+        playerVel.y += 0.1 * dt;
+    }
+    // playerVel.y += gravity * dt * 0.01;
+    player.addMut(playerVel);
     const distFromCameraToPlayer = player.sub(camera.add(centerOfScreen));
     const cameraSpring = 0.05;
     camera.addMut(distFromCameraToPlayer.scale(cameraSpring * dt));
@@ -18,16 +30,18 @@ function tick(dt) {
             chunks[index] = new Chunk(i, new Vector(chunkSize.x * cellSize * i, 0), chunkSize);
         }
     })
-    const pixelSize = cellSize * 1.8 / 32;
-    playerCoord = player.add(new Vector(0, -playerHalfWidth * pixelSize)).shrink(cellSize).floor();
+    playerCoord = player.shrink(cellSize).floor();
     currentChunk = mod(Math.floor(playerCoord.x / chunkSize.x), Chunk.capacity);
     playerCoord.x %= chunkSize.x;
+    let playerLeft = player.x - playerHalfWidth;
+    let playerRight = player.x + playerHalfWidth;
+    let playerBottom = player.y;
+    let playerTop = player.y - 1.8 * cellSize;
+
     const bottomBlock = new Vector(mod(playerCoord.x, chunkSize.x) + 1, playerCoord.y + 1);
-    playerCoord = player.add(new Vector(0, -16 * pixelSize)).shrink(cellSize).floor();
-    playerCoord.x %= chunkSize.x;
-    playerCoord = player.add(new Vector(0, -(32 - playerHalfWidth) * pixelSize)).shrink(cellSize).floor();
-    playerCoord.x %= chunkSize.x;
-    const topBlock = new Vector(mod(playerCoord.x, chunkSize.x) - 1, playerCoord.y - 1);
+    const topBlock = new Vector(mod(playerCoord.x, chunkSize.x) - 1, playerCoord.y - 3);
+    const epsilon = 0//.5;
+    const repulsion = 0//1;
     for (let y = topBlock.y; y <= bottomBlock.y; y++) {
         for (let x = topBlock.x; x <= bottomBlock.x; x++) {
             if (y < 0 || y >= chunkSize.y) continue;
@@ -37,10 +51,41 @@ function tick(dt) {
             } else if (x >= chunkSize.x) {
                 fixChunk = 1;
             }
-            chunks[mod(currentChunk + fixChunk, Chunk.capacity)].map[y][mod(x, chunkSize.x)] = false;
+            const chunk = currentChunk + fixChunk;
+            if (chunks[mod(chunk, Chunk.capacity)].map[y][mod(x, chunkSize.x)]) {
+                let blockLeft = (chunk * chunkSize.x + x) * cellSize;
+                let blockRight = (chunk * chunkSize.x + x + 1) * cellSize;
+                let blockTop = y * cellSize;
+                let blockBottom = (y + 1) * cellSize;
+                if (blockLeft < playerRight && blockRight > playerLeft && blockTop < playerBottom && blockBottom > playerTop) {
+                    window.collided = true
+                    if (playerVel.y < -epsilon && !chunks[mod(chunk, Chunk.capacity)].map[y + 1][mod(x, chunkSize.x)]) {
+                        player.y = blockBottom + 1.8 * cellSize + repulsion;
+                        playerVel.y = 0;
+                    }
+                    if (playerVel.y > epsilon && !chunks[mod(chunk, Chunk.capacity)].map[y - 1][mod(x, chunkSize.x)]) {
+                        player.y = blockTop - repulsion;
+                        playerVel.y = 0;
+                    }
+                }
+                playerLeft = player.x - playerHalfWidth;
+                playerRight = player.x + playerHalfWidth;
+                playerBottom = player.y;
+                playerTop = player.y - 1.8 * cellSize;
+                if (blockLeft < playerRight && blockRight > playerLeft && blockTop < playerBottom && blockBottom > playerTop) {
+                    window.collided = true
+                    if (playerVel.x < -epsilon && !chunks[mod(chunk, Chunk.capacity)].map[y][mod(x + 1, chunkSize.x)]) {
+                        player.x = blockRight + playerHalfWidth + repulsion;
+                        playerVel.x = 0;
+                    }
+                    if (playerVel.x > epsilon && !chunks[mod(chunk, Chunk.capacity)].map[y][mod(x - 1, chunkSize.x)]) {
+                        player.x = blockLeft - playerHalfWidth - repulsion;
+                        playerVel.x = 0;
+                    }
+                }
+            }
         }
     }
-
 }
 function render() {
     ctx.fillStyle = pause ? "rgb(200,200,200)" : "rgb(240,240,240)";

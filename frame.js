@@ -40,8 +40,8 @@ function tick(dt) {
 
     const bottomBlock = new Vector(mod(playerCoord.x, chunkSize.x) + 1, playerCoord.y + 1);
     const topBlock = new Vector(mod(playerCoord.x, chunkSize.x) - 1, playerCoord.y - 3);
-    const epsilon = 0//.5;
-    const repulsion = 0//1;
+    const candidatesForFixX = [];
+    const candidatesForFixY = [];
     for (let y = topBlock.y; y <= bottomBlock.y; y++) {
         for (let x = topBlock.x; x <= bottomBlock.x; x++) {
             if (y < 0 || y >= chunkSize.y) continue;
@@ -58,33 +58,29 @@ function tick(dt) {
                 let blockTop = y * cellSize;
                 let blockBottom = (y + 1) * cellSize;
                 if (blockLeft < playerRight && blockRight > playerLeft && blockTop < playerBottom && blockBottom > playerTop) {
-                    window.collided = true
-                    if (playerVel.y < -epsilon && !chunks[mod(chunk, Chunk.capacity)].map[y + 1][mod(x, chunkSize.x)]) {
-                        player.y = blockBottom + 1.8 * cellSize + repulsion;
-                        playerVel.y = 0;
+                    if (playerVel.x < 0 && !chunks[mod(chunk, Chunk.capacity)].map[y][mod(x + 1, chunkSize.x)]) {
+                        candidatesForFixX.push(blockRight + playerHalfWidth - player.x);
                     }
-                    if (playerVel.y > epsilon && !chunks[mod(chunk, Chunk.capacity)].map[y - 1][mod(x, chunkSize.x)]) {
-                        player.y = blockTop - repulsion;
-                        playerVel.y = 0;
+                    if (playerVel.x > 0 && !chunks[mod(chunk, Chunk.capacity)].map[y][mod(x - 1, chunkSize.x)]) {
+                        candidatesForFixX.push(blockLeft - playerHalfWidth - player.x);
                     }
-                }
-                playerLeft = player.x - playerHalfWidth;
-                playerRight = player.x + playerHalfWidth;
-                playerBottom = player.y;
-                playerTop = player.y - 1.8 * cellSize;
-                if (blockLeft < playerRight && blockRight > playerLeft && blockTop < playerBottom && blockBottom > playerTop) {
-                    window.collided = true
-                    if (playerVel.x < -epsilon && !chunks[mod(chunk, Chunk.capacity)].map[y][mod(x + 1, chunkSize.x)]) {
-                        player.x = blockRight + playerHalfWidth + repulsion;
-                        playerVel.x = 0;
+                    if (playerVel.y < 0 && !chunks[mod(chunk, Chunk.capacity)].map[y + 1][mod(x, chunkSize.x)]) {
+                        candidatesForFixY.push(blockBottom + 1.8 * cellSize - player.y);
                     }
-                    if (playerVel.x > epsilon && !chunks[mod(chunk, Chunk.capacity)].map[y][mod(x - 1, chunkSize.x)]) {
-                        player.x = blockLeft - playerHalfWidth - repulsion;
-                        playerVel.x = 0;
+                    if (playerVel.y > 0 && !chunks[mod(chunk, Chunk.capacity)].map[y - 1][mod(x, chunkSize.x)]) {
+                        candidatesForFixY.push(blockTop - player.y);
                     }
                 }
             }
         }
+    }
+    if (candidatesForFixX.length) {
+        player.x += candidatesForFixX.reduce((min, fix) => Math.abs(fix) < Math.abs(min) ? fix : min, Infinity);
+        playerVel.x = 0;
+    }
+    if (candidatesForFixY.length) {
+        player.y += candidatesForFixY.reduce((min, fix) => Math.abs(fix) < Math.abs(min) ? fix : min, Infinity);
+        playerVel.y = 0;
     }
 }
 function render() {

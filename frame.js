@@ -40,8 +40,7 @@ function tick(dt) {
 
     const bottomBlock = new Vector(mod(playerCoord.x, chunkSize.x) + 1, playerCoord.y + 1);
     const topBlock = new Vector(mod(playerCoord.x, chunkSize.x) - 1, playerCoord.y - 3);
-    const candidatesForFixX = [];
-    const candidatesForFixY = [];
+    window.fix = new Vector();
     for (let y = topBlock.y; y <= bottomBlock.y; y++) {
         for (let x = topBlock.x; x <= bottomBlock.x; x++) {
             if (y < 0 || y >= chunkSize.y) continue;
@@ -58,30 +57,34 @@ function tick(dt) {
                 let blockTop = y * cellSize;
                 let blockBottom = (y + 1) * cellSize;
                 if (blockLeft < playerRight && blockRight > playerLeft && blockTop < playerBottom && blockBottom > playerTop) {
-                    if (playerVel.x < 0 && !chunks[mod(chunk, Chunk.capacity)].map[y][mod(x + 1, chunkSize.x)]) {
-                        candidatesForFixX.push(blockRight + playerHalfWidth - player.x);
+                    if (playerVel.x < 0) {
+                        const penetration = playerLeft - blockRight;
+                        fix.x = Math.min(playerVel.x > penetration ? fix.x : penetration, fix.x);
+                        // candidatesForFixX.push(blockRight + playerHalfWidth - player.x);
                     }
-                    if (playerVel.x > 0 && !chunks[mod(chunk, Chunk.capacity)].map[y][mod(x - 1, chunkSize.x)]) {
-                        candidatesForFixX.push(blockLeft - playerHalfWidth - player.x);
+                    if (playerVel.x > 0) {
+                        const penetration = playerRight - blockLeft;
+                        fix.x = Math.max(playerVel.x < penetration ? fix.x : penetration, fix.x);
+                        // candidatesForFixX.push(blockLeft - playerHalfWidth - player.x);
                     }
-                    if (playerVel.y < 0 && !chunks[mod(chunk, Chunk.capacity)].map[y + 1][mod(x, chunkSize.x)]) {
-                        candidatesForFixY.push(blockBottom + 1.8 * cellSize - player.y);
+                    if (playerVel.y < 0) {
+                        const penetration = playerTop - blockBottom;
+                        fix.y = Math.min(playerVel.y > penetration ? fix.y : penetration, fix.y);
+                        // candidatesForFixY.push(blockBottom + 1.8 * cellSize - player.y);
                     }
-                    if (playerVel.y > 0 && !chunks[mod(chunk, Chunk.capacity)].map[y - 1][mod(x, chunkSize.x)]) {
-                        candidatesForFixY.push(blockTop - player.y);
+                    if (playerVel.y > 0) {
+                        const penetration = playerBottom - blockTop;
+                        fix.y = Math.max(playerVel.y < penetration ? fix.y : penetration, fix.y);
+                        // candidatesForFixY.push(blockTop - player.y);
                     }
                 }
             }
         }
     }
-    if (candidatesForFixX.length) {
-        player.x += candidatesForFixX.reduce((min, fix) => Math.abs(fix) < Math.abs(min) ? fix : min, Infinity);
-        playerVel.x = 0;
-    }
-    if (candidatesForFixY.length) {
-        player.y += candidatesForFixY.reduce((min, fix) => Math.abs(fix) < Math.abs(min) ? fix : min, Infinity);
-        playerVel.y = 0;
-    }
+    // if (fix.x !== 0) playerVel.x = 0;
+    // if (fix.y !== 0) playerVel.y = 0;
+    playerVel.subMut(fix.scale(0.99));
+    player.subMut(fix.scale(1.001));
 }
 function render() {
     ctx.fillStyle = pause ? "rgb(200,200,200)" : "rgb(240,240,240)";
